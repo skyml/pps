@@ -12,7 +12,7 @@ find_package(Git REQUIRED)
 find_package(Threads REQUIRED)
 
 
-option(WITH_GPU         "Compile PaddlePaddle with NVIDIA GPU"          OFF)#${CUDA_FOUND})
+option(WITH_GPU         "Compile PaddlePaddle with NVIDIA GPU"          ${CUDA_FOUND})
 option(WITH_AVX         "Compile PaddlePaddle with AVX intrinsics"      ${AVX_FOUND})
 option(WITH_DSO         "Compile PaddlePaddle with dynamic linked CUDA" ON)
 option(WITH_RDMA        "Compile PaddlePaddle with RDMA support"        OFF)
@@ -47,6 +47,13 @@ set(EXTERNAL_LIBS
     ${CBLAS_LIBRARIES}
     ${PROTOBUF_LIBRARY}
 )
+
+if(WITH_GPU)
+    list(APPEND EXTERNAL_LIB ${CUDA_LIBRARIES} ${CUDA_rt_LIBRARY})
+    if(NOT WITH_DSO)
+        list(APPEND EXTERNAL_LIB ${CUDNN_LIBRARY} ${CUDA_CUBLAS_LIBRARIES} ${CUDA_curand_LIBRARY})
+    endif(NOT WITH_DSO)
+endif(WITH_GPU)
 
 add_subdirectory(proto)
 add_subdirectory(paddle)
